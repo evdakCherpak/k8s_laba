@@ -1,0 +1,7 @@
+# Значения для Helm-чарта yandex-cloud/k8s-csi-s3.
+# Главное: НЕ создавать Secret и StorageClass здесь — ими управляет наше
+# приложение (kustomize) отдельно в каждом namespace (messenger-dev/prod).
+storageClass:
+  create: false
+secret:
+  create: false

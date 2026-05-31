@@ -8,7 +8,6 @@ metadata:
 spec:
   project: default
   source:
-    # ЗАМЕНИТЕ на адрес вашего GitHub-репозитория
     repoURL: https://github.com/evdakCherpak/k8s_laba
     targetRevision: main
     path: k8s/overlays/prod

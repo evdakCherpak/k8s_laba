@@ -5,10 +5,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 spec:
-  # k3d поставляется с Traefik как ingress-контроллером
   ingressClassName: traefik
   rules:
-    # host переопределяется в overlay'ах (dev/prod)
     - host: messenger.localhost
       http:
         paths:

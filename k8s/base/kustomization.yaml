@@ -1,7 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# namespace для всех ресурсов; переопределяется в overlay'ах (dev/prod)
 namespace: messenger
 
 labels:
@@ -10,29 +9,22 @@ labels:
       app.kubernetes.io/part-of: messenger
 
 resources:
-  # namespace
   - namespace.yaml
-  # конфигурация и секреты
   - config/app-config.yaml
   - config/postgres-secret.yaml
   - config/app-db-secret.yaml
   - config/minio-secret.yaml
   - config/csi-s3-secret.yaml
-  # postgres
   - postgres/configmap-initdb.yaml
   - postgres/service.yaml
   - postgres/statefulset.yaml
-  # minio (S3-хранилище)
   - minio/deployment.yaml
   - minio/service.yaml
   - minio/setup-job.yaml
-  # S3 CSI
   - s3-csi/storageclass.yaml
   - s3-csi/pvc.yaml
-  # миграции
   - migrations/migrate-users-job.yaml
   - migrations/migrate-messages-job.yaml
-  # прикладные сервисы
   - user-service/deployment.yaml
   - user-service/service.yaml
   - message-service/deployment.yaml

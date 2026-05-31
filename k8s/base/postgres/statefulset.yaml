@@ -15,7 +15,6 @@ spec:
       labels:
         app: postgres
     spec:
-      # nodeAffinity: БД размещается на системных узлах
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -33,7 +32,6 @@ spec:
             - secretRef:
                 name: postgres-secret
           env:
-            # отдельный подкаталог, чтобы initdb-скрипты отрабатывали корректно
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           volumeMounts:

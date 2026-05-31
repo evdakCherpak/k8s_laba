@@ -1,13 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# отдельное пространство имён для prod-окружения
 namespace: messenger-prod
 
 resources:
   - ../../base
 
-# в prod закрепляем образы по неизменяемому digest (воспроизводимость)
 images:
   - name: mablinov2704/frontend
     digest: sha256:3e7b5052ee45495d656d46aedb41afd1e9aab5d544c02e0f2dfa175d3abeb133
@@ -18,7 +16,6 @@ images:
   - name: mablinov2704/message-service
     digest: sha256:bd0afef8fb344306f79880f682cc54078f84dbc08a08e45278409403bed6613b
 
-# в prod по две копии прикладных сервисов (отказоустойчивость)
 replicas:
   - name: frontend
     count: 2
@@ -30,13 +27,9 @@ replicas:
     count: 2
 
 patches:
-  # S3 CSI под namespace prod
   - path: patches/csi-endpoint.yaml
   - path: patches/storageclass-ns.yaml
-  # внешний домен prod
   - path: patches/ingress-host.yaml
-  # повышенные ресурсы всем Deployment'ам
   - path: patches/resources.yaml
     target:
       kind: Deployment
-  # affinity НЕ ослабляем: в prod остаётся hard workload=app + soft disk=fast (из base)

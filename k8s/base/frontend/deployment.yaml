@@ -28,13 +28,11 @@ spec:
           ports:
             - containerPort: 80
           env:
-            # пустой → браузер ходит на API через same-origin (Ingress)
             - name: BFF_URL
               valueFrom:
                 configMapKeyRef:
                   name: app-config
                   key: BFF_URL
-            # внутренний адрес для server-side проксирования nginx
             - name: BFF_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:

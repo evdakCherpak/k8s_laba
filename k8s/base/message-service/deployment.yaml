@@ -16,14 +16,12 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          # hard-условие: только узлы прикладного слоя
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
                   - key: workload
                     operator: In
                     values: ["app"]
-          # soft-предпочтение: узлы с быстрым диском
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               preference:
@@ -53,7 +51,6 @@ spec:
                   name: app-config
                   key: UPLOADS_DIR
           volumeMounts:
-            # каталог загрузок смонтирован из S3 через CSI
             - name: uploads
               mountPath: /app/uploads
           readinessProbe:

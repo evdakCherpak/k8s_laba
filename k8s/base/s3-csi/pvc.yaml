@@ -3,8 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: uploads
   annotations:
-    # волна 3 (вместе с message-service): к этому моменту бакет уже создан
-    # Job'ом minio-setup в волне 2, поэтому csi-s3 успешно провижинит том
     argocd.argoproj.io/sync-wave: "3"
 spec:
   accessModes:
@@ -12,5 +10,4 @@ spec:
   storageClassName: csi-s3
   resources:
     requests:
-      # для S3-бэкенда размер номинальный
       storage: 5Gi

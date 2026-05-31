@@ -3,7 +3,6 @@ kind: Job
 metadata:
   name: minio-setup
   annotations:
-    # Argo CD hook: создаём бакет после старта MinIO, до запуска message-service.
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
     argocd.argoproj.io/sync-wave: "2"
