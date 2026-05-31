@@ -62,9 +62,6 @@ argocd/
 infra/                          # bootstrap (ставится ВРУЧНУЮ, один раз)
 ├── csi-s3/                     # установка S3-CSI драйвера через Helm
 └── argocd/                     # установка самого Argo CD
-
-docs/
-└── report.md                   # пояснения, проверка, troubleshooting, отчёт
 ```
 
 ---
@@ -142,7 +139,7 @@ git push -u origin main
 
 ```bash
 kubectl apply -f argocd/application-dev.yaml
-# одновременно держим только ОДИН overlay (см. docs/report.md → troubleshooting)
+# одновременно держим только ОДИН overlay
 ```
 
 Дальше Argo CD сам склонирует репозиторий, прогонит kustomize и развернёт приложение.
