@@ -62,7 +62,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: minio-data
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    # та же волна, что и Deployment minio: local-path (WaitForFirstConsumer)
+    # привязывается только при появлении Pod-потребителя
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
