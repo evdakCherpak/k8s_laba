@@ -1,0 +1,26 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-s3
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+# Драйвер yandex-cloud/k8s-csi-s3 (GeeseFS). Устанавливается отдельно (см. infra/csi-s3).
+provisioner: ru.yandex.s3.csi
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  mounter: geesefs
+  # опции монтирования GeeseFS (доступ всем — сервис пишет от своего uid)
+  options: "--memory-limit 1000 --dir-mode 0777 --file-mode 0666"
+  # используем заранее созданный бакет (его создаёт Job minio-setup)
+  bucket: uploads
+  # ссылки на Secret с ключами и endpoint MinIO.
+  # namespace в base = messenger; в overlay'ах патчится на messenger-dev/prod.
+  csi.storage.k8s.io/provisioner-secret-name: csi-s3-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: messenger
+  csi.storage.k8s.io/controller-publish-secret-name: csi-s3-secret
+  csi.storage.k8s.io/controller-publish-secret-namespace: messenger
+  csi.storage.k8s.io/node-stage-secret-name: csi-s3-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: messenger
+  csi.storage.k8s.io/node-publish-secret-name: csi-s3-secret
+  csi.storage.k8s.io/node-publish-secret-namespace: messenger

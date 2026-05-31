@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-service
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: message-service
+  template:
+    metadata:
+      labels:
+        app: message-service
+    spec:
+      affinity:
+        nodeAffinity:
+          # hard-условие: только узлы прикладного слоя
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values: ["app"]
+          # soft-предпочтение: узлы с быстрым диском
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: disk
+                    operator: In
+                    values: ["fast"]
+      containers:
+        - name: message-service
+          image: mablinov2704/message-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MESSAGE_SERVICE_HTTP_PORT
+            - name: DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: app-db-secret
+                  key: MESSAGE_DB_DSN
+            - name: UPLOADS_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: UPLOADS_DIR
+          volumeMounts:
+            # каталог загрузок смонтирован из S3 через CSI
+            - name: uploads
+              mountPath: /app/uploads
+          readinessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: uploads

@@ -1,0 +1,19 @@
+# В dev убираем soft-предпочтение disk=fast (узлов с быстрым диском может не быть).
+# Hard-условие workload=app остаётся (в base).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-service
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values: ["app"]
+          # пустой список затирает soft-предпочтение из base
+          preferredDuringSchedulingIgnoredDuringExecution: []

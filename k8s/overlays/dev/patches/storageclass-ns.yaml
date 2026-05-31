@@ -1,0 +1,10 @@
+# StorageClass cluster-scoped: namespace секрета не меняется автоматически — задаём явно
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-s3
+parameters:
+  csi.storage.k8s.io/provisioner-secret-namespace: messenger-dev
+  csi.storage.k8s.io/controller-publish-secret-namespace: messenger-dev
+  csi.storage.k8s.io/node-stage-secret-namespace: messenger-dev
+  csi.storage.k8s.io/node-publish-secret-namespace: messenger-dev

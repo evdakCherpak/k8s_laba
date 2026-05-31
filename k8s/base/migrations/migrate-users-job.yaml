@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-users
+  annotations:
+    # Argo CD hook: миграции прогоняются на каждом синке (Job immutable → удаляем старый).
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: migrate-users
+    spec:
+      restartPolicy: OnFailure
+      # миграции относятся к прикладному слою → workload=app
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values: ["app"]
+      initContainers:
+        # 1) ждём готовности postgres
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          command:
+            - sh
+            - -c
+            - "until pg_isready -h postgres -p 5432; do echo waiting-db; sleep 2; done"
+        # 2) копируем встроенные в образ goose-миграции в общий том
+        - name: copy-migrations
+          image: mablinov2704/user-service:latest
+          command: ["sh", "-c", "cp -r /app/migrations/. /migrations/"]
+          volumeMounts:
+            - name: migrations
+              mountPath: /migrations
+      containers:
+        - name: goose
+          image: ghcr.io/kukymbr/goose-docker:latest
+          env:
+            - name: GOOSE_DRIVER
+              value: postgres
+            - name: GOOSE_DBSTRING
+              valueFrom:
+                secretKeyRef:
+                  name: app-db-secret
+                  key: USER_DB_DSN
+            - name: GOOSE_MIGRATION_DIR
+              value: /migrations
+          volumeMounts:
+            - name: migrations
+              mountPath: /migrations
+      volumes:
+        - name: migrations
+          emptyDir: {}

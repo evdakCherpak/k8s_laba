@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values: ["app"]
+      containers:
+        - name: frontend
+          image: mablinov2704/frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            # пустой → браузер ходит на API через same-origin (Ingress)
+            - name: BFF_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BFF_URL
+            # внутренний адрес для server-side проксирования nginx
+            - name: BFF_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BFF_INTERNAL_URL
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

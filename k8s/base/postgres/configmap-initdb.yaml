@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+data:
+  # Выполняется только при первой инициализации тома postgres.
+  01-create-databases.sql: |
+    CREATE DATABASE usersdb;
+    CREATE DATABASE messagesdb;

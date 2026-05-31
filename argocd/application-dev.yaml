@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: messenger-dev
+  namespace: argocd
+  # запрещаем удалять Application, не дочистив ресурсы приложения
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # ЗАМЕНИТЕ на адрес вашего GitHub-репозитория
+    repoURL: https://github.com/evdakCherpak/k8s_laba
+    targetRevision: main
+    # путь до overlay внутри репозитория; kustomize Argo CD применит сам
+    path: k8s/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: messenger-dev
+  syncPolicy:
+    automated:
+      prune: true      # удалять то, что убрали из Git
+      selfHeal: true   # откатывать ручные изменения в кластере
+    syncOptions:
+      - CreateNamespace=true   # создать namespace, если его нет

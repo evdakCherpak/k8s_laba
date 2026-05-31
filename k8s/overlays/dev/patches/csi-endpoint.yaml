@@ -1,0 +1,7 @@
+# Эндпоинт MinIO должен указывать на сервис в namespace dev
+apiVersion: v1
+kind: Secret
+metadata:
+  name: csi-s3-secret
+stringData:
+  endpoint: http://minio.messenger-dev.svc.cluster.local:9000
